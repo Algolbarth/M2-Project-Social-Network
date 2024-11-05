@@ -30,6 +30,7 @@ function auth(req, res, next) {
 app.post("/login", function (req, res) {
     const { username, password } = req.body;
 
+    // TODO: Replace with actual authentication logic
     if (username === dummyUser.username && password === dummyUser.password) {
         req.session.user = username;
         res.sendStatus(200);
