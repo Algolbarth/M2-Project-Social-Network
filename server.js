@@ -41,6 +41,11 @@ app.post("/login", function (req, res) {
     }
 });
 
+app.post("/logout", function (req, res) {
+    req.session.destroy();
+    res.sendStatus(200);
+});
+
 app.get("/protected", auth, function (req, res) {
     res.send("You are authenticated");
 });
