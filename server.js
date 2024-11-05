@@ -1,5 +1,6 @@
 const express = require("express");
 const session = require("express-session");
+const bodyParser = require("body-parser");
 
 const app = express();
 const port = 3000;
@@ -10,6 +11,7 @@ const dummyUser = {
     password: "password",
 };
 
+app.use(bodyParser.json());
 app.use(
     session({
         secret: "secret-key",
