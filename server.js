@@ -77,6 +77,15 @@ app.get("/protected", auth, function (req, res) {
     res.send("You are authenticated as " + req.session.user);
 });
 
+app.get("/events", auth, function (req, res) {
+    // TODO: Implement event fetching
+});
+
+app.get("/event/:id", auth, function (req, res) {
+    const { id } = req.params;
+    // TODO: Implement single event fetching with details
+});
+
 app.post("/event", auth, function (req, res) {
     // TODO: Implement event creation
 });
