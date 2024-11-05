@@ -9,12 +9,6 @@ const client = new MongoClient(process.env.MONGODB_URI);
 const app = express();
 const port = 3000;
 
-// Dummy user credentials for testing
-const dummyUser = {
-    username: "user",
-    password: "password",
-};
-
 app.use(bodyParser.json());
 app.use(
     session({
@@ -33,15 +27,23 @@ function auth(req, res, next) {
     }
 }
 
-app.post("/login", function (req, res) {
+app.post("/login", async function (req, res) {
     const { username, password } = req.body;
 
-    // TODO: Replace with actual authentication logic
-    if (username === dummyUser.username && password === dummyUser.password) {
-        req.session.user = username;
-        res.sendStatus(200);
-    } else {
-        res.sendStatus(401);
+    try {
+        await client.connect();
+        const database = await client.db(process.env.MONGODB_DATABASE);
+        const usersCollection = database.collection("users");
+        const user = await usersCollection.findOne({ username, password });
+
+        if (user) {
+            req.session.user = username;
+            res.sendStatus(200);
+        } else {
+            res.sendStatus(401);
+        }
+    } finally {
+        await client.close();
     }
 });
 
