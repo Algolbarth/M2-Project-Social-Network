@@ -72,6 +72,7 @@ app.post("/register", async function (req, res) {
     }
 });
 
+// Test endpoint to check if user is authenticated
 app.get("/protected", auth, function (req, res) {
     res.send("You are authenticated as " + req.session.user);
 });
