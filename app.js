@@ -1,29 +1,24 @@
-// modules
-const morgan = require("morgan");
 const express = require("express");
-const path = require("path");
 const session = require("express-session");
 
 const app = express();
 const port = 3000;
 
-// view engine setup
-app.set("views", path.join(__dirname, "views"));
-app.set("view engine", "pug");
-
-// middlewares
-app.use(morgan("dev"));
-app.use(express.urlencoded({ extended: true }));
+// Dummy user credentials for testing
+const dummyUser = {
+    username: "user",
+    password: "password",
+};
 
 app.use(
     session({
-        secret: "top secret",
+        secret: "secret-key",
         resave: true,
         saveUninitialized: true,
     }),
 );
 
-// middleware d'authentification
+// Middleware to check if user is authenticated
 function auth(req, res, next) {
     if (req?.session?.user) {
         return next();
@@ -32,36 +27,21 @@ function auth(req, res, next) {
     }
 }
 
-app.get("/", function (req, res) {
-    if (req?.session?.user) {
-        res.redirect("/home");
+app.post("/login", function (req, res) {
+    const { username, password } = req.body;
+
+    if (username === dummyUser.username && password === dummyUser.password) {
+        req.session.user = username;
+        res.sendStatus(200);
     } else {
-        res.redirect("/login");
+        res.sendStatus(401);
     }
 });
 
-app.get("/login", function (req, res) {
-    console.log("login");
-    res.render("login", { title: "Connexion" });
+app.get("/protected", auth, function (req, res) {
+    res.send("You are authenticated");
 });
 
-app.post("/login", function (req, res) {
-    // Utilisateur fake ici
-    // TODO : aller chercher l'utilisateur en base de données à partir du login et du (hash du) mot de passe
-    req.session.user = { firstname: "Jean", lastname: "Dupond" };
-    res.redirect("/home");
-});
-
-app.get("/home", auth, function (req, res) {
-    res.render("layout", { title: "Page d'accueil", user: req.session.user });
-});
-
-app.post("/logout", function (req, res) {
-    req.session.destroy();
-    res.redirect("/login");
-});
-
-// server start
 app.listen(port, () => {
-    console.log(`Server started on http://localhost:${port}`);
+    console.log(`App listening at http://localhost:${port}`);
 });
