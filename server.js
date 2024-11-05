@@ -73,7 +73,7 @@ app.post("/register", async function (req, res) {
 });
 
 app.get("/protected", auth, function (req, res) {
-    res.send("You are authenticated");
+    res.send("You are authenticated as " + req.session.user);
 });
 
 app.listen(port, () => {
