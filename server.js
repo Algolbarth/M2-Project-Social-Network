@@ -52,6 +52,26 @@ app.post("/logout", function (req, res) {
     res.sendStatus(200);
 });
 
+app.post("/register", async function (req, res) {
+    const { username, password } = req.body;
+
+    try {
+        await client.connect();
+        const database = await client.db(process.env.MONGODB_DATABASE);
+        const usersCollection = database.collection("users");
+        const user = await usersCollection.findOne({ username });
+
+        if (user) {
+            res.sendStatus(409);
+        } else {
+            await usersCollection.insertOne({ username, password });
+            res.sendStatus(201);
+        }
+    } finally {
+        await client.close();
+    }
+});
+
 app.get("/protected", auth, function (req, res) {
     res.send("You are authenticated");
 });
