@@ -1,0 +1,20 @@
+meta {
+  name: Modify details
+  type: http
+  seq: 6
+}
+
+patch {
+  url: http://localhost:3000/details
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "firstname": "John",
+    "lastname": "Doe",
+    "birthdate": "1970-01-01T00:00:00.000Z",
+    "avatarUrl": "https://dummyimage.com/400x400"
+  }
+}

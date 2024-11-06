@@ -115,6 +115,34 @@ app.get("/details", auth, async function (req, res) {
     }
 });
 
+app.patch("/details", auth, async function (req, res) {
+    const username = req.session.user;
+    const { firstname, lastname, birthdate, avatarUrl } = req.body;
+
+    const payload = {
+        ...(firstname && { firstname: firstname }),
+        ...(lastname && { lastname: lastname }),
+        ...(birthdate && { birthdate: birthdate }),
+        ...(avatarUrl && { avatarUrl: avatarUrl }),
+    };
+
+    try {
+        await client.connect();
+        const database = await client.db(process.env.MONGODB_DATABASE);
+        const usersCollection = database.collection("users");
+        const user = await usersCollection.findOne({ username: username });
+
+        if (user) {
+            await usersCollection.updateOne({ username: username }, { $set: payload });
+            res.sendStatus(200);
+        } else {
+            res.sendStatus(404);
+        }
+    } finally {
+        await client.close();
+    }
+});
+
 app.get("/events", auth, function (req, res) {
     // TODO: Implement event fetching
 });
