@@ -210,7 +210,7 @@ app.get("/event/:id", validateId, async function (req, res) {
 
         const favoritesCollection = database.collection("favorites");
         const favorites = await favoritesCollection
-            .find({ eventId: new ObjectId(id) }, { projection: { _id: 0, eventId: 0 } })
+            .find({ eventId: id }, { projection: { _id: 0, eventId: 0 } })
             .toArray();
 
         if (event) {
