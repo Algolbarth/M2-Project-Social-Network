@@ -382,7 +382,11 @@ io.on("connection", (socket) => {
     // TODO: Handle user connection
 
     socket.on("message", (msg) => {
-        io.emit("message", msg);
+        io.emit("message", {
+            username: username,
+            message: msg,
+            date: new Date(),
+        });
     });
 
     socket.on("disconnect", () => {

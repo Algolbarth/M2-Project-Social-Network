@@ -65,9 +65,10 @@
                 button.addEventListener("click", sendMessage);
 
                 // Listen for messages from the server
-                socket.on("message", function (msg) {
+                socket.on("message", function (data) {
+                    const { username, message, date } = data;
                     const li = document.createElement("li");
-                    li.textContent = msg;
+                    li.textContent = "[" + date + "] " + username + ": " + message;
                     document.getElementById("messages").appendChild(li);
                 });
             });
