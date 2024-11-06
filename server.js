@@ -73,10 +73,10 @@ app.post("/register", async function (req, res) {
                 username: username,
                 password: password,
                 status: "user",
-                avatarUrl: "",
-                firstname: "",
-                lastname: "",
-                birthdate: new Date(),
+                avatarUrl: null,
+                firstname: null,
+                lastname: null,
+                birthdate: null,
             });
             res.sendStatus(201);
         }
