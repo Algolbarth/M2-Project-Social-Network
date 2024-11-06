@@ -125,18 +125,24 @@ app.get("/details", auth, async function (req, res) {
         await client.connect();
         const database = client.db(process.env.MONGODB_ADDON_DB);
         const usersCollection = database.collection("users");
-        const user = await usersCollection.findOne({ username: username });
+        const user = await usersCollection.findOne(
+            { username: username },
+            { projection: { _id: 0 } },
+        );
 
         const eventsCollection = database.collection("events");
-        const events = await eventsCollection.find({ username: username }).toArray();
+        const events = await eventsCollection
+            .find({ username: username }, { projection: { username: 0 } })
+            .toArray();
 
         const favoritesCollection = database.collection("favorites");
-        const favorites = await favoritesCollection.find({ username: username }).toArray();
+        const favorites = await favoritesCollection
+            .find({ username: username }, { projection: { _id: 0, username: 0 } })
+            .toArray();
 
         if (user) {
             res.json({
                 ...user,
-                _id: undefined,
                 events: events,
                 favorites: favorites,
             });
@@ -202,8 +208,16 @@ app.get("/event/:id", validateId, async function (req, res) {
         const eventsCollection = database.collection("events");
         const event = await eventsCollection.findOne({ _id: new ObjectId(id) });
 
+        const favoritesCollection = database.collection("favorites");
+        const favorites = await favoritesCollection
+            .find({ eventId: new ObjectId(id) }, { projection: { _id: 0, eventId: 0 } })
+            .toArray();
+
         if (event) {
-            res.json(event);
+            res.json({
+                ...event,
+                favorites: favorites,
+            });
         } else {
             res.sendStatus(404);
         }
