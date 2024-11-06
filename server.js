@@ -307,6 +307,58 @@ app.delete("/event/:id", auth, validateId, async function (req, res) {
     }
 });
 
+app.post("/event/:id/favorite", auth, validateId, async function (req, res) {
+    const { id } = req.params;
+    const username = req.session.user;
+
+    try {
+        await client.connect();
+        const database = client.db(process.env.MONGODB_ADDON_DB);
+        const eventsCollection = database.collection("events");
+        const event = await eventsCollection.findOne({ _id: new ObjectId(id) });
+
+        if (event) {
+            const favoritesCollection = database.collection("favorites");
+            const favorite = await favoritesCollection.findOne({ username: username, eventId: id });
+
+            if (favorite) {
+                res.sendStatus(409);
+            } else {
+                await favoritesCollection.insertOne({
+                    username: username,
+                    eventId: id,
+                });
+                res.sendStatus(201);
+            }
+        } else {
+            res.sendStatus(404);
+        }
+    } finally {
+        await client.close();
+    }
+});
+
+app.delete("/event/:id/favorite", auth, validateId, async function (req, res) {
+    const { id } = req.params;
+    const username = req.session.user;
+
+    try {
+        await client.connect();
+        const database = client.db(process.env.MONGODB_ADDON_DB);
+        const favoritesCollection = database.collection("favorites");
+        const favorite = await favoritesCollection.findOne({ username: username, eventId: id });
+
+        if (favorite) {
+            await favoritesCollection.deleteOne({ username: username, eventId: id });
+            res.sendStatus(200);
+        } else {
+            res.sendStatus(404);
+        }
+    } finally {
+        await client.close();
+    }
+});
+
 app.listen(port, () => {
     console.log(`App listening at http://localhost:${port}`);
 });
