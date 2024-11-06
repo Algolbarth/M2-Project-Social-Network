@@ -34,7 +34,10 @@ app.post("/login", async function (req, res) {
         await client.connect();
         const database = await client.db(process.env.MONGODB_DATABASE);
         const usersCollection = database.collection("users");
-        const user = await usersCollection.findOne({ username, password });
+        const user = await usersCollection.findOne({
+            username: username,
+            password: password,
+        });
 
         if (user) {
             req.session.user = username;
@@ -59,7 +62,9 @@ app.post("/register", async function (req, res) {
         await client.connect();
         const database = await client.db(process.env.MONGODB_DATABASE);
         const usersCollection = database.collection("users");
-        const user = await usersCollection.findOne({ username });
+        const user = await usersCollection.findOne({
+            username: username,
+        });
 
         if (user) {
             res.sendStatus(409);
