@@ -119,6 +119,11 @@ app.patch("/details", auth, async function (req, res) {
     const username = req.session.user;
     const { firstname, lastname, birthdate, avatarUrl } = req.body;
 
+    // Check if birthdate is a valid date
+    if (birthdate && isNaN(Date.parse(birthdate))) {
+        return res.sendStatus(400);
+    }
+
     const payload = {
         ...(firstname && { firstname: firstname }),
         ...(lastname && { lastname: lastname }),
