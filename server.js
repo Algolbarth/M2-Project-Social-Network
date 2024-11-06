@@ -402,14 +402,21 @@ io.on("connection", (socket) => {
             return;
         }
 
+        // Truncate message if it's too long
+        const maxLength = 2000;
+        const message = msg.length > maxLength ? msg.substring(0, maxLength) : msg;
+
+        // Build message payload
         const payload = {
             username: username,
-            message: msg,
+            message: message,
             date: new Date(),
         };
 
+        // Broadcast message to all connected clients
         io.emit("message", payload);
 
+        // Save message to database
         try {
             await client.connect();
             const database = client.db(process.env.MONGODB_ADDON_DB);
