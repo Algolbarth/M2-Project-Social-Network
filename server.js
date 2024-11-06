@@ -269,6 +269,30 @@ app.patch("/event/:id", auth, validateId, validateEvent, async function (req, re
     }
 });
 
+app.delete("/event/:id", auth, validateId, async function (req, res) {
+    const { id } = req.params;
+    const username = req.session.user;
+
+    try {
+        await client.connect();
+        const database = client.db(process.env.MONGODB_ADDON_DB);
+        const eventsCollection = database.collection("events");
+        const event = await eventsCollection.findOne({
+            _id: new ObjectId(id),
+            username: username,
+        });
+
+        if (event) {
+            await eventsCollection.deleteOne({ _id: new ObjectId(id) });
+            res.sendStatus(200);
+        } else {
+            res.sendStatus(404);
+        }
+    } finally {
+        await client.close();
+    }
+});
+
 app.listen(port, () => {
     console.log(`App listening at http://localhost:${port}`);
 });
