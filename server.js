@@ -27,6 +27,39 @@ function auth(req, res, next) {
     }
 }
 
+// Middleware to check if the id is a valid ObjectId
+function validateId(req, res, next) {
+    const { id } = req.params;
+
+    if (!ObjectId.isValid(id)) {
+        return res.sendStatus(400);
+    }
+
+    next();
+}
+
+// Middleware to check the values of an event body
+function validateEvent(req, res, next) {
+    const { title, theme, imageUrl, price, date } = req.body;
+
+    // Check if theme is valid
+    if (theme && !["sport", "culture", "festif", "pro", "autres"].includes(theme)) {
+        return res.sendStatus(400);
+    }
+
+    // Check if price is a number
+    if (price && isNaN(price)) {
+        return res.sendStatus(400);
+    }
+
+    // Check if date is a valid date
+    if (date && isNaN(Date.parse(date))) {
+        return res.sendStatus(400);
+    }
+
+    next();
+}
+
 app.post("/login", async function (req, res) {
     const { username, password } = req.body;
 
@@ -160,13 +193,8 @@ app.get("/events", async function (req, res) {
     }
 });
 
-app.get("/event/:id", async function (req, res) {
+app.get("/event/:id", validateId, async function (req, res) {
     const { id } = req.params;
-
-    // Check if id is a valid ObjectId
-    if (!id.match(/^[0-9a-fA-F]{24}$/)) {
-        return res.sendStatus(400);
-    }
 
     try {
         await client.connect();
@@ -184,19 +212,9 @@ app.get("/event/:id", async function (req, res) {
     }
 });
 
-app.post("/event", auth, async function (req, res) {
+app.post("/event", auth, validateEvent, async function (req, res) {
     const username = req.session.user;
     const { title, theme, imageUrl, price, date } = req.body;
-
-    // Check if price is a number
-    if (isNaN(price)) {
-        return res.sendStatus(400);
-    }
-
-    // Check if date is a valid date
-    if (isNaN(Date.parse(date))) {
-        return res.sendStatus(400);
-    }
 
     try {
         await client.connect();
@@ -218,25 +236,10 @@ app.post("/event", auth, async function (req, res) {
     }
 });
 
-app.patch("/event/:id", auth, async function (req, res) {
+app.patch("/event/:id", auth, validateId, validateEvent, async function (req, res) {
     const { id } = req.params;
     const username = req.session.user;
     const { title, theme, imageUrl, price, date } = req.body;
-
-    // Check if id is a valid ObjectId
-    if (!id.match(/^[0-9a-fA-F]{24}$/)) {
-        return res.sendStatus(400);
-    }
-
-    // Check if price is a number
-    if (price && isNaN(price)) {
-        return res.sendStatus(400);
-    }
-
-    // Check if date is a valid date
-    if (date && isNaN(Date.parse(date))) {
-        return res.sendStatus(400);
-    }
 
     try {
         await client.connect();
