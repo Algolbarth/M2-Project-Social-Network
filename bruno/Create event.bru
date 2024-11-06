@@ -1,0 +1,21 @@
+meta {
+  name: Create event
+  type: http
+  seq: 7
+}
+
+post {
+  url: http://localhost:3000/event
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "title": "Event 1",
+    "theme": "autres",
+    "imageUrl": "https://dummyimage.com/600x400",
+    "price": 9.99,
+    "date": "1970-01-01T00:00:00.000Z"
+  }
+}

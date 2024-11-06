@@ -157,8 +157,38 @@ app.get("/event/:id", auth, function (req, res) {
     // TODO: Implement single event fetching with details
 });
 
-app.post("/event", auth, function (req, res) {
-    // TODO: Implement event creation
+app.post("/event", auth, async function (req, res) {
+    const username = req.session.user;
+    const { title, theme, imageUrl, price, date } = req.body;
+
+    // Check if price is a number
+    if (isNaN(price)) {
+        return res.sendStatus(400);
+    }
+
+    // Check if date is a valid date
+    if (isNaN(Date.parse(date))) {
+        return res.sendStatus(400);
+    }
+
+    try {
+        await client.connect();
+        const database = client.db(process.env.MONGODB_ADDON_DB);
+        const eventsCollection = database.collection("events");
+
+        await eventsCollection.insertOne({
+            username: username,
+            title: title,
+            theme: theme,
+            imageUrl: imageUrl,
+            price: price,
+            date: date,
+        });
+
+        res.sendStatus(201);
+    } finally {
+        await client.close();
+    }
 });
 
 app.put("/event/:id", auth, function (req, res) {
