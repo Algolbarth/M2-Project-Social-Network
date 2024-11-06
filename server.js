@@ -397,6 +397,11 @@ io.on("connection", (socket) => {
     // TODO: Handle user connection
 
     socket.on("message", async function (msg) {
+        // If message is empty, ignore
+        if (!msg) {
+            return;
+        }
+
         const payload = {
             username: username,
             message: msg,
