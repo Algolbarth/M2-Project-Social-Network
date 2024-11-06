@@ -124,13 +124,6 @@ app.patch("/details", auth, async function (req, res) {
         return res.sendStatus(400);
     }
 
-    const payload = {
-        ...(firstname && { firstname: firstname }),
-        ...(lastname && { lastname: lastname }),
-        ...(birthdate && { birthdate: birthdate }),
-        ...(avatarUrl && { avatarUrl: avatarUrl }),
-    };
-
     try {
         await client.connect();
         const database = client.db(process.env.MONGODB_ADDON_DB);
@@ -138,6 +131,13 @@ app.patch("/details", auth, async function (req, res) {
         const user = await usersCollection.findOne({ username: username });
 
         if (user) {
+            const payload = {
+                ...(firstname && { firstname: firstname }),
+                ...(lastname && { lastname: lastname }),
+                ...(birthdate && { birthdate: birthdate }),
+                ...(avatarUrl && { avatarUrl: avatarUrl }),
+            };
+
             await usersCollection.updateOne({ username: username }, { $set: payload });
             res.sendStatus(200);
         } else {
