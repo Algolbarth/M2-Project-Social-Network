@@ -4,7 +4,7 @@ const bodyParser = require("body-parser");
 const { MongoClient } = require("mongodb");
 require("dotenv").config();
 
-const client = new MongoClient(process.env.MONGODB_URI);
+const client = new MongoClient(process.env.MONGODB_ADDON_URI);
 
 const app = express();
 const port = 3000;
@@ -32,7 +32,7 @@ app.post("/login", async function (req, res) {
 
     try {
         await client.connect();
-        const database = await client.db(process.env.MONGODB_DATABASE);
+        const database = await client.db(process.env.MONGODB_ADDON_DB);
         const usersCollection = database.collection("users");
         const user = await usersCollection.findOne({
             username: username,
@@ -60,7 +60,7 @@ app.post("/register", async function (req, res) {
 
     try {
         await client.connect();
-        const database = await client.db(process.env.MONGODB_DATABASE);
+        const database = await client.db(process.env.MONGODB_ADDON_DB);
         const usersCollection = database.collection("users");
         const user = await usersCollection.findOne({
             username: username,
@@ -90,7 +90,7 @@ app.get("/details", auth, async function (req, res) {
 
     try {
         await client.connect();
-        const database = await client.db(process.env.MONGODB_DATABASE);
+        const database = await client.db(process.env.MONGODB_ADDON_DB);
         const usersCollection = database.collection("users");
         const user = await usersCollection.findOne({ username: username });
 
@@ -128,7 +128,7 @@ app.patch("/details", auth, async function (req, res) {
 
     try {
         await client.connect();
-        const database = await client.db(process.env.MONGODB_DATABASE);
+        const database = await client.db(process.env.MONGODB_ADDON_DB);
         const usersCollection = database.collection("users");
         const user = await usersCollection.findOne({ username: username });
 
