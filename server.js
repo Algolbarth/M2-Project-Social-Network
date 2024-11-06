@@ -369,6 +369,21 @@ app.delete("/event/:id/favorite", auth, validateId, async function (req, res) {
     }
 });
 
+app.get("/history", auth, async function (req, res) {
+    try {
+        await client.connect();
+        const database = client.db(process.env.MONGODB_ADDON_DB);
+        const messagesCollection = database.collection("messages");
+        const messages = await messagesCollection
+            .find({}, { sort: { date: 1 }, projection: { _id: 0 } })
+            .toArray();
+
+        res.json(messages);
+    } finally {
+        await client.close();
+    }
+});
+
 io.on("connection", (socket) => {
     const session = socket.request.session;
 
@@ -381,12 +396,23 @@ io.on("connection", (socket) => {
 
     // TODO: Handle user connection
 
-    socket.on("message", (msg) => {
-        io.emit("message", {
+    socket.on("message", async function (msg) {
+        const payload = {
             username: username,
             message: msg,
             date: new Date(),
-        });
+        };
+
+        io.emit("message", payload);
+
+        try {
+            await client.connect();
+            const database = client.db(process.env.MONGODB_ADDON_DB);
+            const messagesCollection = database.collection("messages");
+            await messagesCollection.insertOne(payload);
+        } finally {
+            await client.close();
+        }
     });
 
     socket.on("disconnect", () => {
