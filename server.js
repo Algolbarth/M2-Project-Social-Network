@@ -1,14 +1,20 @@
 const express = require("express");
 const session = require("express-session");
 const bodyParser = require("body-parser");
+const http = require("http");
+const { Server } = require("socket.io");
 const { MongoClient, ObjectId } = require("mongodb");
 require("dotenv").config();
 
-const client = new MongoClient(process.env.MONGODB_ADDON_URI);
-
-const app = express();
 const port = process.env.PORT || 3000;
 
+const app = express();
+const server = http.createServer(app);
+const io = new Server(server);
+
+const client = new MongoClient(process.env.MONGODB_ADDON_URI);
+
+app.use(express.static("public"));
 app.use(bodyParser.json());
 app.use(
     session({
@@ -359,6 +365,19 @@ app.delete("/event/:id/favorite", auth, validateId, async function (req, res) {
     }
 });
 
-app.listen(port, () => {
+io.on("connection", (socket) => {
+    console.log("A user connected:", socket.id);
+
+    socket.on("message", (msg) => {
+        console.log("Message received:", msg);
+        io.emit("message", msg);
+    });
+
+    socket.on("disconnect", () => {
+        console.log("A user disconnected:", socket.id);
+    });
+});
+
+server.listen(port, () => {
     console.log(`App listening at http://localhost:${port}`);
 });
