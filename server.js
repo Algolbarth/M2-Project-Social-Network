@@ -14,15 +14,19 @@ const io = new Server(server);
 
 const client = new MongoClient(process.env.MONGODB_ADDON_URI);
 
+const sessionMiddleware = session({
+    secret: "secret-key",
+    resave: true,
+    saveUninitialized: true,
+});
+
 app.use(express.static("public"));
 app.use(bodyParser.json());
-app.use(
-    session({
-        secret: "secret-key",
-        resave: true,
-        saveUninitialized: true,
-    }),
-);
+app.use(sessionMiddleware);
+
+io.use((socket, next) => {
+    sessionMiddleware(socket.request, socket.request.res || {}, next);
+});
 
 // Middleware to check if user is authenticated
 function auth(req, res, next) {
@@ -366,15 +370,23 @@ app.delete("/event/:id/favorite", auth, validateId, async function (req, res) {
 });
 
 io.on("connection", (socket) => {
-    console.log("A user connected:", socket.id);
+    const session = socket.request.session;
+
+    if (!session || !session.user) {
+        socket.disconnect(true);
+        return;
+    }
+
+    const username = session.user;
+
+    // TODO: Handle user connection
 
     socket.on("message", (msg) => {
-        console.log("Message received:", msg);
         io.emit("message", msg);
     });
 
     socket.on("disconnect", () => {
-        console.log("A user disconnected:", socket.id);
+        // TODO: Handle user disconnect
     });
 });
 
