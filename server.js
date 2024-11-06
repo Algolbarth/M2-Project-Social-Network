@@ -69,7 +69,15 @@ app.post("/register", async function (req, res) {
         if (user) {
             res.sendStatus(409);
         } else {
-            await usersCollection.insertOne({ username, password });
+            await usersCollection.insertOne({
+                username: username,
+                password: password,
+                status: "user",
+                avatarUrl: "",
+                firstname: "",
+                lastname: "",
+                birthdate: new Date(),
+            });
             res.sendStatus(201);
         }
     } finally {
