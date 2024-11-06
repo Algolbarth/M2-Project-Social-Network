@@ -85,9 +85,34 @@ app.post("/register", async function (req, res) {
     }
 });
 
-// Test endpoint to check if user is authenticated
-app.get("/protected", auth, function (req, res) {
-    res.send("You are authenticated as " + req.session.user);
+app.get("/details", auth, async function (req, res) {
+    const username = req.session.user;
+
+    try {
+        await client.connect();
+        const database = await client.db(process.env.MONGODB_DATABASE);
+        const usersCollection = database.collection("users");
+        const user = await usersCollection.findOne({ username: username });
+
+        const eventsCollection = database.collection("events");
+        const events = await eventsCollection.find({ username: username }).toArray();
+
+        const favoritesCollection = database.collection("favorites");
+        const favorites = await favoritesCollection.find({ username: username }).toArray();
+
+        if (user) {
+            res.json({
+                ...user,
+                _id: undefined,
+                events: events,
+                favorites: favorites,
+            });
+        } else {
+            res.sendStatus(404);
+        }
+    } finally {
+        await client.close();
+    }
 });
 
 app.get("/events", auth, function (req, res) {
