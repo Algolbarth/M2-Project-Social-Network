@@ -218,9 +218,52 @@ app.post("/event", auth, async function (req, res) {
     }
 });
 
-app.put("/event/:id", auth, function (req, res) {
+app.patch("/event/:id", auth, async function (req, res) {
     const { id } = req.params;
-    // TODO: Implement event update
+    const username = req.session.user;
+    const { title, theme, imageUrl, price, date } = req.body;
+
+    // Check if id is a valid ObjectId
+    if (!id.match(/^[0-9a-fA-F]{24}$/)) {
+        return res.sendStatus(400);
+    }
+
+    // Check if price is a number
+    if (price && isNaN(price)) {
+        return res.sendStatus(400);
+    }
+
+    // Check if date is a valid date
+    if (date && isNaN(Date.parse(date))) {
+        return res.sendStatus(400);
+    }
+
+    try {
+        await client.connect();
+        const database = client.db(process.env.MONGODB_ADDON_DB);
+        const eventsCollection = database.collection("events");
+        const event = await eventsCollection.findOne({
+            _id: new ObjectId(id),
+            username: username,
+        });
+
+        if (event) {
+            const payload = {
+                ...(title && { title: title }),
+                ...(theme && { theme: theme }),
+                ...(imageUrl && { imageUrl: imageUrl }),
+                ...(price && { price: price }),
+                ...(date && { date: date }),
+            };
+
+            await eventsCollection.updateOne({ _id: new ObjectId(id) }, { $set: payload });
+            res.sendStatus(200);
+        } else {
+            res.sendStatus(404);
+        }
+    } finally {
+        await client.close();
+    }
 });
 
 app.listen(port, () => {
