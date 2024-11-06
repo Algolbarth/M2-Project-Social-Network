@@ -1,7 +1,7 @@
 const express = require("express");
 const session = require("express-session");
 const bodyParser = require("body-parser");
-const { MongoClient } = require("mongodb");
+const { MongoClient, ObjectId } = require("mongodb");
 require("dotenv").config();
 
 const client = new MongoClient(process.env.MONGODB_ADDON_URI);
@@ -148,13 +148,40 @@ app.patch("/details", auth, async function (req, res) {
     }
 });
 
-app.get("/events", auth, function (req, res) {
-    // TODO: Implement event fetching
+app.get("/events", async function (req, res) {
+    try {
+        await client.connect();
+        const database = client.db(process.env.MONGODB_ADDON_DB);
+        const eventsCollection = database.collection("events");
+        const events = await eventsCollection.find({}).toArray();
+        res.json(events);
+    } finally {
+        await client.close();
+    }
 });
 
-app.get("/event/:id", auth, function (req, res) {
+app.get("/event/:id", async function (req, res) {
     const { id } = req.params;
-    // TODO: Implement single event fetching with details
+
+    // Check if id is a valid ObjectId
+    if (!id.match(/^[0-9a-fA-F]{24}$/)) {
+        return res.sendStatus(400);
+    }
+
+    try {
+        await client.connect();
+        const database = client.db(process.env.MONGODB_ADDON_DB);
+        const eventsCollection = database.collection("events");
+        const event = await eventsCollection.findOne({ _id: new ObjectId(id) });
+
+        if (event) {
+            res.json(event);
+        } else {
+            res.sendStatus(404);
+        }
+    } finally {
+        await client.close();
+    }
 });
 
 app.post("/event", auth, async function (req, res) {
