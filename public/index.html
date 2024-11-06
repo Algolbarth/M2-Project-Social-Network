@@ -8,7 +8,12 @@
     </head>
     <body>
         <h1>Socket.IO Chat</h1>
-        <input id="message" type="text" placeholder="Type a message..." />
+        <input
+            id="message"
+            type="text"
+            placeholder="Type a message..."
+            onkeydown="if (event.key === 'Enter') sendMessage()"
+        />
         <button onclick="sendMessage()">Send</button>
         <ul id="messages"></ul>
 
