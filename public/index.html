@@ -15,13 +15,8 @@
             <button>Submit</button>
         </form>
 
-        <input
-            id="message"
-            type="text"
-            placeholder="Type a message..."
-            onkeydown="if (event.key === 'Enter') sendMessage()"
-        />
-        <button onclick="sendMessage()">Send</button>
+        <input id="message" type="text" placeholder="Type a message..." />
+        <button id="message-btn">Send</button>
         <ul id="messages"></ul>
 
         <script>
@@ -40,21 +35,41 @@
                 });
             });
 
-            const socket = io();
+            // Check if user is logged in with a session cookie
+            fetch("/details").then((response) => {
+                if (!response.ok) {
+                    alert("You are not logged in");
+                    return;
+                }
 
-            // Send a message to the server
-            function sendMessage() {
+                form.remove();
+
+                const socket = io();
+
+                // Send a message to the server
+                function sendMessage() {
+                    const input = document.getElementById("message");
+                    const message = input.value;
+                    socket.emit("message", message);
+                    input.value = "";
+                }
+
                 const input = document.getElementById("message");
-                const message = input.value;
-                socket.emit("message", message);
-                input.value = "";
-            }
+                input.addEventListener("keydown", function (event) {
+                    if (event.key === "Enter") {
+                        sendMessage();
+                    }
+                });
 
-            // Listen for messages from the server
-            socket.on("message", function (msg) {
-                const li = document.createElement("li");
-                li.textContent = msg;
-                document.getElementById("messages").appendChild(li);
+                const button = document.getElementById("message-btn");
+                button.addEventListener("click", sendMessage);
+
+                // Listen for messages from the server
+                socket.on("message", function (msg) {
+                    const li = document.createElement("li");
+                    li.textContent = msg;
+                    document.getElementById("messages").appendChild(li);
+                });
             });
         </script>
     </body>
