@@ -198,7 +198,18 @@ app.patch("/details", auth, async function (req, res) {
 });
 
 app.get("/events", async function (req, res) {
-    const { name, lePrice, ltPrice, gePrice, gtPrice, theme, beforeDate, afterDate } = req.query;
+    const {
+        name,
+        lePrice,
+        ltPrice,
+        gePrice,
+        gtPrice,
+        theme,
+        beforeDate,
+        afterDate,
+        sortPrice,
+        sortDate,
+    } = req.query;
 
     if (lePrice && isNaN(lePrice)) {
         return res.sendStatus(400);
@@ -228,6 +239,14 @@ app.get("/events", async function (req, res) {
         return res.sendStatus(400);
     }
 
+    if (sortPrice && !["ascendent", "descendent"].includes(sortPrice)) {
+        return res.sendStatus(400);
+    }
+
+    if (sortDate && !["ascendent", "descendent"].includes(sortDate)) {
+        return res.sendStatus(400);
+    }
+
     const price = {
         ...(lePrice && { $lte: parseFloat(lePrice) }),
         ...(ltPrice && { $lt: parseFloat(ltPrice) }),
@@ -242,9 +261,18 @@ app.get("/events", async function (req, res) {
 
     const query = {
         ...(name && { title: { $regex: name, $options: "i" } }),
-        ...(Object.keys(price).length > 0 && { price: price }),
+        ...(price && Object.keys(price).length > 0 && { price: price }),
         ...(theme && { theme: theme }),
-        ...(Object.keys(date).length > 0 && { date: date }),
+        ...(date && Object.keys(date).length > 0 && { date: date }),
+    };
+
+    const sort = {
+        ...(sortPrice && { price: sortPrice === "ascendent" ? 1 : -1 }),
+        ...(sortDate && { date: sortDate === "ascendent" ? 1 : -1 }),
+    };
+
+    const options = {
+        ...(sort && Object.keys(sort).length > 0 && { sort: sort }),
     };
 
     console.log(query);
@@ -253,7 +281,7 @@ app.get("/events", async function (req, res) {
         await client.connect();
         const database = client.db(process.env.MONGODB_ADDON_DB);
         const eventsCollection = database.collection("events");
-        const events = await eventsCollection.find(query).toArray();
+        const events = await eventsCollection.find(query, options).toArray();
         res.json(events);
     } finally {
         await client.close();
