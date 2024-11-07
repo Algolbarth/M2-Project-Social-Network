@@ -375,10 +375,9 @@ app.get("/history", auth, async function (req, res) {
         const database = client.db(process.env.MONGODB_ADDON_DB);
         const messagesCollection = database.collection("messages");
         const messages = await messagesCollection
-            .find({}, { sort: { date: 1 }, projection: { _id: 0 }, limit: 100 })
+            .find({}, { sort: { date: -1 }, projection: { _id: 0 }, limit: 100 })
             .toArray();
-
-        res.json(messages);
+        res.json(messages.reverse());
     } finally {
         await client.close();
     }
