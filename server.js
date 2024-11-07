@@ -198,11 +198,62 @@ app.patch("/details", auth, async function (req, res) {
 });
 
 app.get("/events", async function (req, res) {
+    const { name, lePrice, ltPrice, gePrice, gtPrice, theme, beforeDate, afterDate } = req.query;
+
+    if (lePrice && isNaN(lePrice)) {
+        return res.sendStatus(400);
+    }
+
+    if (ltPrice && isNaN(ltPrice)) {
+        return res.sendStatus(400);
+    }
+
+    if (gePrice && isNaN(gePrice)) {
+        return res.sendStatus(400);
+    }
+
+    if (gtPrice && isNaN(gtPrice)) {
+        return res.sendStatus(400);
+    }
+
+    if (theme && !["sport", "culture", "festif", "pro", "autres"].includes(theme)) {
+        return res.sendStatus(400);
+    }
+
+    if (beforeDate && isNaN(Date.parse(beforeDate))) {
+        return res.sendStatus(400);
+    }
+
+    if (afterDate && isNaN(Date.parse(afterDate))) {
+        return res.sendStatus(400);
+    }
+
+    const price = {
+        ...(lePrice && { $lte: parseFloat(lePrice) }),
+        ...(ltPrice && { $lt: parseFloat(ltPrice) }),
+        ...(gePrice && { $gte: parseFloat(gePrice) }),
+        ...(gtPrice && { $gt: parseFloat(gtPrice) }),
+    };
+
+    const date = {
+        ...(beforeDate && { $lte: new Date(beforeDate) }),
+        ...(afterDate && { $gte: new Date(afterDate) }),
+    };
+
+    const query = {
+        ...(name && { title: { $regex: name, $options: "i" } }),
+        ...(Object.keys(price).length > 0 && { price: price }),
+        ...(theme && { theme: theme }),
+        ...(Object.keys(date).length > 0 && { date: date }),
+    };
+
+    console.log(query);
+
     try {
         await client.connect();
         const database = client.db(process.env.MONGODB_ADDON_DB);
         const eventsCollection = database.collection("events");
-        const events = await eventsCollection.find({}).toArray();
+        const events = await eventsCollection.find(query).toArray();
         res.json(events);
     } finally {
         await client.close();
