@@ -1,89 +1,46 @@
 <!doctype html>
 <html lang="en">
-    <head>
-        <meta charset="UTF-8" />
-        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <title>Socket.IO Chat</title>
-        <script src="/socket.io/socket.io.js"></script>
-    </head>
-    <body>
-        <h1>Socket.IO Chat</h1>
 
-        <form action="/login" method="post" id="login-form">
-            <input type="text" name="username" placeholder="Username" />
-            <input type="password" name="password" placeholder="Password" />
-            <button>Submit</button>
-        </form>
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Socket.IO Chat</title>
+    <script src="/socket.io/socket.io.js"></script>
+    <link rel="stylesheet" href="style.css">
+</head>
 
-        <ul id="messages"></ul>
+<body>
+    <header>
+        <div id="title">
+            Socket.IO Chat
+        </div>
+        <div id="user">
+            <button id="logout">Logout</button>
+        </div>
+    </header>
+
+    <div id="main">
+        <div id="login">
+            <form action="/login" method="post" id="login-form">
+                <input type="text" name="username" placeholder="Username" />
+                <br />
+                <br />
+                <input type="password" name="password" placeholder="Password" />
+                <br />
+                <br />
+                <button>Submit</button>
+            </form>
+        </div>
+
+        <div id="messages" class="table"></div>
+    </div>
+
+    <footer>
         <input id="message" type="text" placeholder="Type a message..." />
         <button id="message-btn">Send</button>
+    </footer>
+</body>
 
-        <script>
-            const form = document.getElementById("login-form");
-            form.addEventListener("submit", function (event) {
-                event.preventDefault();
-                const formData = new FormData(form);
-                fetch("/login", {
-                    method: "POST",
-                    body: JSON.stringify(Object.fromEntries(formData)),
-                    headers: {
-                        "Content-Type": "application/json",
-                    },
-                }).then(() => {
-                    location.reload();
-                });
-            });
+<script src="./home.js"></script>
 
-            // Check if user is logged in with a session cookie
-            fetch("/history").then(async (response) => {
-                if (!response.ok) {
-                    alert("You are not logged in");
-                    return;
-                }
-
-                form.remove();
-
-                function addMessage(username, message, date) {
-                    const li = document.createElement("li");
-                    li.textContent = "[" + date + "] " + username + ": " + message;
-                    document.getElementById("messages").appendChild(li);
-                }
-
-                const history = await response.json();
-
-                // Display chat history
-                history.forEach((data) => {
-                    const { username, message, date } = data;
-                    addMessage(username, message, date);
-                });
-
-                const socket = io();
-
-                // Send a message to the server
-                function sendMessage() {
-                    const input = document.getElementById("message");
-                    const message = input.value;
-                    socket.emit("message", message);
-                    input.value = "";
-                }
-
-                const input = document.getElementById("message");
-                input.addEventListener("keydown", function (event) {
-                    if (event.key === "Enter") {
-                        sendMessage();
-                    }
-                });
-
-                const button = document.getElementById("message-btn");
-                button.addEventListener("click", sendMessage);
-
-                // Listen for messages from the server
-                socket.on("message", function (data) {
-                    const { username, message, date } = data;
-                    addMessage(username, message, date);
-                });
-            });
-        </script>
-    </body>
 </html>
