@@ -127,3 +127,7 @@ div#infos {
     align-items: center;
     height: 100%;
 }
+
+div#details {
+    padding: 8px;
+}
