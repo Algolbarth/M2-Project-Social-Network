@@ -2,6 +2,7 @@ const login = document.getElementById("login");
 const login_form = document.getElementById("login-form");
 const btn_register = document.getElementById("btn_register");
 const register = document.getElementById("register");
+const register_form = document.getElementById("register-form");
 const btn_login = document.getElementById("btn_login");
 
 login_form.addEventListener("submit", function (event) {
@@ -21,6 +22,20 @@ login_form.addEventListener("submit", function (event) {
 btn_register.addEventListener("click", function (event) {
     login.style.display = 'none';
     register.style.display = 'flex';
+});
+
+register_form.addEventListener("submit", function (event) {
+    event.preventDefault();
+    const formData = new FormData(register_form);
+    fetch("/register", {
+        method: "POST",
+        body: JSON.stringify(Object.fromEntries(formData)),
+        headers: {
+            "Content-Type": "application/json",
+        },
+    }).then(() => {
+        location.reload();
+    });
 });
 
 btn_login.addEventListener("click", function (event) {
