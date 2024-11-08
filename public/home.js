@@ -2,6 +2,7 @@ const form = document.getElementById("login-form");
 const login = document.getElementById("login");
 const messages = document.getElementById("messages");
 const user = document.getElementById("user");
+const username = document.getElementById("username");
 const btn_logout = document.getElementById("logout");
 const message_bar = document.getElementById("message_bar");
 const infos = document.getElementById("infos");
@@ -35,13 +36,17 @@ fetch("/history").then(async (response) => {
     login.style.display = 'none';
     messages.style.display = 'grid';
     user.style.display = 'flex';
+    fetch("/details").then(async (r) => {
+        const info = await r.json();
+        username.innerHTML = info.username;
+    })
     message_bar.style.display = 'grid';
     infos.style.display = 'none';
 
     const history = await response.json();
     const socket = io();
 
-    function addMessage(username, message, date_info) {
+    function addMessage(pseudo, message, date_info) {
         const row = document.createElement("div");
         row.classList.add('row');
 
@@ -55,7 +60,7 @@ fetch("/history").then(async (response) => {
         row.appendChild(date_cell);
 
         const username_cell = document.createElement("div");
-        username_cell.textContent = username;
+        username_cell.textContent = pseudo;
         row.appendChild(username_cell);
 
         const message_cell = document.createElement("div");
@@ -63,8 +68,6 @@ fetch("/history").then(async (response) => {
         row.appendChild(message_cell);
 
         messages.appendChild(row);
-
-        console.log(messages)
     }
 
     // Display chat history

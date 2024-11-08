@@ -75,6 +75,15 @@ div#user {
     padding-right: 8px;
 }
 
+button#username {
+    border-radius: 1em 0 0 1em;
+}
+
+button#logout {
+    border-radius: 0 1em 1em 0;
+    background: crimson;
+}
+
 /* Consulter les messages */
 div.table {
     display: grid;
