@@ -22,8 +22,15 @@ div#main {
     background: #303030;
 }
 
+div#login {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+}
+
 form#login-form {
-    text-align:center;
+    text-align: center;
 }
 
 button,
@@ -57,11 +64,15 @@ header {
 }
 
 div#title {
-    font-size: xx-large;
+    font-size: 3em;
+    text-align: center;
 }
 
 div#user {
-    text-align: right;
+    display: none;
+    align-items: center;
+    justify-content: right;
+    padding-right: 8px;
 }
 
 /* Consulter les messages */
@@ -81,12 +92,15 @@ div.row:hover {
 
 /* Envoie de messages*/
 footer {
-    display: grid;
+    background: #202020;
+}
+
+div#message_bar {
+    display: none;
     grid-template-columns: auto 3em;
     width: 98%;
     left: 0;
     padding: 1%;
-    background: #202020;
 }
 
 input#message {
@@ -96,4 +110,11 @@ input#message {
 button#message-btn {
     padding: 0.5em;
     border-radius: 0 1em 1em 0;
+}
+
+div#infos {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
 }

@@ -1,8 +1,10 @@
 const form = document.getElementById("login-form");
+const login = document.getElementById("login");
 const messages = document.getElementById("messages");
 const user = document.getElementById("user");
 const btn_logout = document.getElementById("logout");
-const footer = document.querySelector('footer');
+const message_bar = document.getElementById("message_bar");
+const infos = document.getElementById("infos");
 
 form.addEventListener("submit", function (event) {
     event.preventDefault();
@@ -22,17 +24,19 @@ form.addEventListener("submit", function (event) {
 fetch("/history").then(async (response) => {
     if (!response.ok) {
         alert("You are not logged in");
-        form.style.display = 'block';
+        login.style.display = 'flex';
         messages.style.display = 'none';
         user.style.display = 'none';
-        footer.style.display = 'none';
+        message_bar.style.display = 'none';
+        infos.style.display = 'flex';
         return;
     }
 
-    form.style.display = 'none';
+    login.style.display = 'none';
     messages.style.display = 'grid';
-    user.style.display = 'block';
-    footer.style.display = 'grid';
+    user.style.display = 'flex';
+    message_bar.style.display = 'grid';
+    infos.style.display = 'none';
 
     const history = await response.json();
     const socket = io();
@@ -96,10 +100,11 @@ fetch("/history").then(async (response) => {
                 alert("You are not logged in");
                 return;
             }
-            form.style.display = 'block';
+            login.style.display = 'flex';
             messages.style.display = 'none';
             user.style.display = 'none';
-            footer.style.display = 'none';
+            message_bar.style.display = 'none';
+            infos.style.display = 'flex';
         });
     };
 
