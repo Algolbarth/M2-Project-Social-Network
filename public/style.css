@@ -45,6 +45,7 @@ input {
 
 button {
     border-radius: 1em;
+    cursor: pointer;
 }
 
 button:hover {
@@ -63,9 +64,14 @@ header {
     background: #202020;
 }
 
-div#title {
+button#title {
     font-size: 3em;
     text-align: center;
+    border: none;
+}
+
+button#title:hover {
+    background: transparent;
 }
 
 div#user {

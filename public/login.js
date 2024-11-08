@@ -25,7 +25,7 @@ fetch("/history").then(async (response) => {
         message_bar.style.display = 'none';
         infos.style.display = 'flex';
         return;
-    }
+    };
 
     login.style.display = 'none';
     messages.style.display = 'grid';
@@ -33,23 +33,18 @@ fetch("/history").then(async (response) => {
     message_bar.style.display = 'grid';
     infos.style.display = 'none';
 
-    const socket = io();
+    function menu() {
+        details.style.display = 'none';
+        messages.style.display = 'grid';
+        message_bar.style.display = 'grid';
+    };
+    title.addEventListener("click", menu);
 
-    // Send a message to the server
-    input.addEventListener("keydown", function (event) {
-        if (event.key === "Enter") {
-            sendMessage(socket);
-        }
-    });
-    btn_send.addEventListener("click", sendMessage);
-
-    username.addEventListener("click", show_details);
-
-    // Display header
     fetch("/details").then(async (r) => {
         const info = await r.json();
         username.innerHTML = info.username;
-    })
+    });
+    username.addEventListener("click", show_details);
 
     function logout() {
         fetch("/logout", {
@@ -73,6 +68,16 @@ fetch("/history").then(async (response) => {
     display_chat(response);
 
     // Listen for messages from the server
+    const socket = io();
+
+    // Send a message to the server
+    input.addEventListener("keydown", function (event) {
+        if (event.key === "Enter") {
+            sendMessage(socket);
+        }
+    });
+    btn_send.addEventListener("click", () => { sendMessage(socket) });
+
     socket.on("message", function (data) {
         const { username, message, date } = data;
         addMessage(username, message, date);

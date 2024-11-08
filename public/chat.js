@@ -32,7 +32,7 @@ function addMessage(pseudo, message, date_info) {
     row.appendChild(message_cell);
 
     messages.appendChild(row);
-}
+};
 
 async function display_chat (response) {
     const history = await response.json();
@@ -40,4 +40,4 @@ async function display_chat (response) {
         const { username, message, date } = data;
         addMessage(username, message, date);
     });
-}
+};
