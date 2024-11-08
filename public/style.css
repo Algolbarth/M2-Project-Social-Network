@@ -137,3 +137,7 @@ div#infos {
 div#details {
     padding: 8px;
 }
+
+img.event {
+    width: 10em;
+}
