@@ -1,9 +1,12 @@
 const login = document.getElementById("login");
-const form = document.getElementById("login-form");
+const login_form = document.getElementById("login-form");
+const btn_register = document.getElementById("btn_register");
+const register = document.getElementById("register");
+const btn_login = document.getElementById("btn_login");
 
-form.addEventListener("submit", function (event) {
+login_form.addEventListener("submit", function (event) {
     event.preventDefault();
-    const formData = new FormData(form);
+    const formData = new FormData(login_form);
     fetch("/login", {
         method: "POST",
         body: JSON.stringify(Object.fromEntries(formData)),
@@ -15,11 +18,22 @@ form.addEventListener("submit", function (event) {
     });
 });
 
+btn_register.addEventListener("click", function (event) {
+    login.style.display = 'none';
+    register.style.display = 'flex';
+});
+
+btn_login.addEventListener("click", function (event) {
+    login.style.display = 'flex';
+    register.style.display = 'none';
+});
+
 // Check if user is logged in with a session cookie
 fetch("/history").then(async (response) => {
     if (!response.ok) {
         alert("You are not logged in");
         login.style.display = 'flex';
+        register.style.display = 'none';
         messages.style.display = 'none';
         user.style.display = 'none';
         message_bar.style.display = 'none';
@@ -28,6 +42,7 @@ fetch("/history").then(async (response) => {
     };
 
     login.style.display = 'none';
+    register.style.display = 'none';
     messages.style.display = 'grid';
     user.style.display = 'flex';
     message_bar.style.display = 'grid';

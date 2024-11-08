@@ -19,16 +19,38 @@
     </header>
 
     <div id="main">
-        <div id="login">
-            <form action="/login" method="post" id="login-form">
-                <input type="text" name="username" placeholder="Username" />
-                <br />
-                <br />
-                <input type="password" name="password" placeholder="Password" />
-                <br />
-                <br />
-                <button>Submit</button>
-            </form>
+        <div id="login" class="form">
+            <div style="display:grid;grid-template-rows: 1fr 1fr;">
+                <form action="/login" method="post" id="login-form">
+                    <input type="text" name="username" placeholder="Username" />
+                    <br />
+                    <br />
+                    <input type="password" name="password" placeholder="Password" />
+                    <br />
+                    <br />
+                    <button>Submit</button>
+                </form>
+                <div style="display:flex;align-items:center;justify-content:center;">
+                    <button id="btn_register">Register</button>
+                </div>
+            </div>
+        </div>
+
+        <div id="register" class="form">
+            <div style="display:grid;grid-template-rows: 1fr 1fr;">
+                <form action="/register" method="post" id="login-form">
+                    <input type="text" name="username" placeholder="Username" />
+                    <br />
+                    <br />
+                    <input type="password" name="password" placeholder="Password" />
+                    <br />
+                    <br />
+                    <button>Submit</button>
+                </form>
+                <div style="display:flex;align-items:center;justify-content:center;">
+                    <button id="btn_login">Login</button>
+                </div>
+            </div>
         </div>
 
         <div id="messages" class="table"></div>

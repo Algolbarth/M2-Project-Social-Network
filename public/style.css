@@ -22,14 +22,14 @@ div#main {
     background: #303030;
 }
 
-div#login {
+div.form {
     display: flex;
     justify-content: center;
     align-items: center;
     height: 100%;
 }
 
-form#login-form {
+form {
     text-align: center;
 }
 
