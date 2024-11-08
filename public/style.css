@@ -141,3 +141,8 @@ div#details {
 img.event {
     width: 10em;
 }
+
+div.event {
+    display: grid;
+    grid-template-columns: 10em auto;
+}
